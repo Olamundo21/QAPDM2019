@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_questions">
+
+    <fragment
+        android:id="@+id/nav_questions"
+        android:name="pt.uac.qa.ui.QuestionFragment"
+        android:label="Perguntas"
+        tools:layout="@layout/fragment_layout" />
+
+    <fragment
+        android:id="@+id/nav_my_questions"
+        android:name="pt.uac.qa.ui.MyQuestionsFragment"
+        android:label="Minhas Perguntas"
+        tools:layout="@layout/fragment_layout" />
+
+    <fragment
+        android:id="@+id/nav_my_answers"
+        android:name="pt.uac.qa.ui.MyAnswersFragment"
+        android:label="Minhas Respostas"
+        tools:layout="@layout/fragment_layout" />
+
+
+
+</navigation>

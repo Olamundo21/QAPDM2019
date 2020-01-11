@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_questions"
+            android:icon="@drawable/ic_chat_black_24dp"
+            android:title="@string/menu_questions" />
+        <item
+            android:id="@+id/nav_my_questions"
+            android:icon="@drawable/ic_chat_black_24dp"
+            android:title="@string/menu_my_questions" />
+        <item
+            android:id="@+id/nav_my_answers"
+            android:icon="@drawable/ic_comment_black_24dp"
+            android:title="@string/menu_my_answers" />
+    </group>
+
+    <item>
+        <menu>
+            <item
+                android:id="@+id/nav_logout"
+                android:icon="@drawable/ic_exit_to_app_black_24dp"
+                android:title="@string/menu_sign_out"/>
+        </menu>
+    </item>
+</menu>
