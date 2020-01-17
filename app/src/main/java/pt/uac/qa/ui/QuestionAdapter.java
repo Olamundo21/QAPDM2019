@@ -31,7 +31,7 @@ final class QuestionAdapter extends ListViewAdapter<Question> {
 
     @Override
     protected boolean acceptsItem(Question item, CharSequence constraint) {
-        return false;
+        return item.getTitle().contains(constraint);
     }
 
     private static class QuestionViewHolder implements ViewHolder<Question> {

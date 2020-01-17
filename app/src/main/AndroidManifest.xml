@@ -17,6 +17,8 @@
         android:usesCleartextTraffic="true"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning,UnusedAttribute">
 
+        <activity android:name=".ui.ViewQuestionActivity" android:parentActivityName=".MainActivity" />
+
         <service
             android:name=".services.QuestionService"
             android:exported="false" />
@@ -44,12 +46,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" />
 
-        <activity android:name=".ui.AddQuestionActivity" />
+        <activity android:name=".ui.EditQuestionActivity" android:parentActivityName=".MainActivity"/>
 
         <service
             android:name=".services.AccessTokenService"

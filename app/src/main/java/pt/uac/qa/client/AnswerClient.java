@@ -63,7 +63,14 @@ public class AnswerClient extends AuthenticatedClient {
     }
 
     public Answer getAnswer(final String answerId) throws ClientException {
-        return null;
+        return executeRequest(new AuthenticatedRequest<Answer>() {
+            @Override
+            Response<Answer> doExecute() throws IOException {
+                final HttpResponse response = httpClient.get(
+                        url(String.format("/answers/%s", answerId)));
+                return new AnswerResponse(response);
+            }
+        });
     }
 
     public void deleteAnswer(final String answerId) throws ClientException {
@@ -83,19 +90,51 @@ public class AnswerClient extends AuthenticatedClient {
     }
 
     public Answer updateAnswer(final String answerId, final String answer) throws ClientException {
-        return null;
+        return executeRequest(new AuthenticatedRequest<Answer>() {
+            @Override
+            Response<Answer> doExecute() throws IOException, JSONException {
+                final HttpResponse response = httpClient.patch(
+                        url(String.format("/answers/%s", answerId)), createJsonPayload(answer).toString());
+
+                return new AnswerResponse(response);
+            }
+        });
     }
 
     public Answer markAnswerCorrect(final String answerId) throws ClientException {
-        return null;
+        return executeRequest(new AuthenticatedRequest<Answer>() {
+            @Override
+            Response<Answer> doExecute() throws IOException {
+                final HttpResponse response = httpClient.patch(
+                        url(String.format("/answers/%s/mark-as-correct", answerId)));
+
+                return new AnswerResponse(response);
+            }
+        });
     }
 
     public Answer voteAnswerUp(final String answerId) throws ClientException {
-        return null;
+        return executeRequest(new AuthenticatedRequest<Answer>() {
+            @Override
+            Response<Answer> doExecute() throws IOException {
+                final HttpResponse response = httpClient.patch(
+                        url(String.format("/answers/%s/vote-up", answerId)));
+
+                return new AnswerResponse(response);
+            }
+        });
     }
 
     public Answer voteAnswerDown(final String answerId) throws ClientException {
-        return null;
+        return executeRequest(new AuthenticatedRequest<Answer>() {
+            @Override
+            Response<Answer> doExecute() throws IOException {
+                final HttpResponse response = httpClient.patch(
+                        url(String.format("/answers/%s/vote-down", answerId)));
+
+                return new AnswerResponse(response);
+            }
+        });
     }
 
     private JSONObject createJsonPayload(final String answerBody) throws JSONException {

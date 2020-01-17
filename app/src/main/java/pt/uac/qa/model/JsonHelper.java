@@ -40,7 +40,10 @@ final class JsonHelper {
     }
 
     String getString(final String name) throws JSONException {
-        return json.getString(name);
+        if (json.has(name))
+            return json.getString(name);
+
+        return null;
     }
 
     int getInt(final String name) throws JSONException {

@@ -60,6 +60,16 @@ public class HttpClient {
         return executeRequest(HTTP.Method.PUT, url, body, mediaType);
     }
 
+    public HttpResponse patch(final URL url) throws IOException {
+        addHeader("X-HTTP-Method-Override", "PATCH");
+        return post(url);
+    }
+
+    public HttpResponse patch(final URL url, final String body) throws IOException {
+        addHeader("X-HTTP-Method-Override", "PATCH");
+        return post(url, body);
+    }
+
     public HttpResponse delete(final URL url) throws IOException {
         return executeRequest(HTTP.Method.DELETE, url, null, null);
     }

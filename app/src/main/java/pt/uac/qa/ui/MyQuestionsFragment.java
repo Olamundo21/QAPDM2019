@@ -7,12 +7,9 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -22,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
-import pt.uac.qa.MainActivity;
 import pt.uac.qa.R;
 import pt.uac.qa.model.Question;
 import pt.uac.qa.services.QuestionService;
@@ -35,11 +31,11 @@ public class MyQuestionsFragment extends BaseFragment {
             if (intent.hasExtra(QuestionService.RESULT_ERROR)) {
                 Exception error = (Exception) intent.getSerializableExtra(QuestionService.RESULT_ERROR);
                 Toast.makeText(getContext(), error.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-            } else {
+            } else if (intent.hasExtra(QuestionService.RESULT_QUESTIONS)) {
                 final List<Question> questions = (List<Question>) intent.getSerializableExtra(QuestionService.RESULT_QUESTIONS);
                 adapter.loadItems(questions);
-                loaded = true;
-                ((MainActivity) getActivity()).saveState("my_questions_loaded", loaded);
+            } else {
+                loadMyQuestions();
             }
 
             progressBar.setVisibility(View.GONE);
@@ -50,7 +46,6 @@ public class MyQuestionsFragment extends BaseFragment {
     private QuestionAdapter adapter;
     private ListView questionList;
     private ProgressBar progressBar;
-    private boolean loaded;
 
     private List<String> selectedQuestions = new ArrayList<>();
 
@@ -60,13 +55,6 @@ public class MyQuestionsFragment extends BaseFragment {
         progressBar = root.findViewById(R.id.progressBar);
         questionList.setAdapter(adapter = new QuestionAdapter(getActivity()));
 
-        questionList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-            }
-        });
-
         questionList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
@@ -75,39 +63,16 @@ public class MyQuestionsFragment extends BaseFragment {
             }
         });
 
-        questionList.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
-            @Override
-            public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-                Question question = (Question) adapter.getItem(position);
+        questionList.setMultiChoiceModeListener(this);
 
-                if (checked) {
-                    selectedQuestions.add(question.getQuestionId());
-                } else {
-                    selectedQuestions.remove(question.getQuestionId());
-                }
+        questionList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                final Question question = (Question) adapter.getItem(position);
+                Intent intent = new Intent(getActivity(), EditQuestionActivity.class);
+                intent.putExtra("question_id", question.getQuestionId());
+                startActivity(intent);
             }
-
-            @Override
-            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-                MenuInflater inflater = mode.getMenuInflater();
-                inflater.inflate(R.menu.menu_delete, menu);
-                return true;
-            }
-
-            @Override
-            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-                return false;
-            }
-
-            @Override
-            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-                mode.finish();
-                deleteSelectedQuestions();
-                return true;
-            }
-
-            @Override
-            public void onDestroyActionMode(ActionMode mode) {}
         });
 
         return root;
@@ -117,13 +82,7 @@ public class MyQuestionsFragment extends BaseFragment {
     public void onResume() {
         super.onResume();
         getActivity().registerReceiver(receiver, new IntentFilter(QuestionService.INTENT_FILTER));
-
-        MainActivity activity = (MainActivity) getActivity();
-        loaded = (boolean) activity.getState("my_questions_loaded", false);
-
-        if (!loaded) {
-            loadMyQuestions();
-        }
+        loadMyQuestions();
     }
 
     @Override
@@ -133,12 +92,41 @@ public class MyQuestionsFragment extends BaseFragment {
     }
 
     @Override
+    public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+        Question question = (Question) adapter.getItem(position);
+
+        if (checked) {
+            selectedQuestions.add(question.getQuestionId());
+        } else {
+            selectedQuestions.remove(question.getQuestionId());
+        }
+
+        mode.setTitle(String.format("%s selected", selectedQuestions.size()));
+    }
+
+    @Override
+    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+        mode.finish();
+        deleteSelectedQuestions();
+        return true;
+    }
+
+    @Override
     protected void refresh() {
         loadMyQuestions();
     }
 
-    private void deleteSelectedQuestions() {
+    @Override
+    protected void search(CharSequence constraint) {
+        adapter.getFilter().filter(constraint);
+    }
 
+    private void deleteSelectedQuestions() {
+        if (selectedQuestions.isEmpty())
+            return;
+
+        QuestionService.deleteQuestions(getActivity(),
+                selectedQuestions.toArray(new String[0]));
     }
 
     private void loadMyQuestions() {

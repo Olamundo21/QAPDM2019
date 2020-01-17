@@ -1,9 +1,11 @@
 package pt.uac.qa.model;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -15,9 +17,10 @@ import androidx.annotation.NonNull;
 public class Question implements Serializable {
     private String questionId;
     private String title;
-    //private String body;
+    private String body;
     private Date datePublished;
     private List<String> tags;
+    private List<Answer> answers;
     private int answersGiven;
     private User user;
 
@@ -37,6 +40,14 @@ public class Question implements Serializable {
         this.title = title;
     }
 
+    public String getBody() {
+        return body;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
+    }
+
     public Date getDatePublished() {
         return datePublished;
     }
@@ -51,6 +62,14 @@ public class Question implements Serializable {
 
     public void setTags(List<String> tags) {
         this.tags = tags;
+    }
+
+    public List<Answer> getAnswers() {
+        return answers;
+    }
+
+    public void setAnswers(List<Answer> answers) {
+        this.answers = answers;
     }
 
     public int getAnswersGiven() {
@@ -75,10 +94,22 @@ public class Question implements Serializable {
 
         question.setQuestionId(helper.getString("questionId"));
         question.setTitle(helper.getString("title"));
+        question.setBody(helper.getString("body"));
         question.setAnswersGiven(helper.getInt("answersGiven"));
         question.setUser(helper.getUser("user"));
         question.setTags(helper.getStringList("tags"));
         question.setDatePublished(helper.getDate("datePublished"));
+
+        if (json.has("answers")) {
+            JSONArray answersArray = json.getJSONArray("answers");
+            List<Answer> answers = new ArrayList<>();
+
+            for (int i = 0; i < answersArray.length(); i++) {
+                answers.add(Answer.fromJson(answersArray.getJSONObject(i)));
+            }
+
+            question.setAnswers(answers);
+        }
 
         return question;
     }

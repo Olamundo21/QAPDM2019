@@ -54,7 +54,7 @@ public final class QuestionClient extends AuthenticatedClient {
         return executeRequest(new AuthenticatedRequest<Question>() {
             @Override
             Response<Question> doExecute() throws IOException, JSONException {
-                final HttpResponse response = httpClient.put(
+                final HttpResponse response = httpClient.patch(
                         url("/questions/" + questionId), createJsonPayload(title, body).toString());
                 return new QuestionResponse(response);
             }

@@ -3,7 +3,6 @@ package pt.uac.qa;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,12 +11,10 @@ import android.widget.TextView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
@@ -26,23 +23,14 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import pt.uac.qa.model.User;
-import pt.uac.qa.ui.AddQuestionActivity;
+import pt.uac.qa.ui.EditQuestionActivity;
 
 public class MainActivity extends AppCompatActivity {
     public static final String INTENT_FILTER = "pt.uac.qa.MAIN_INTENT_FILTER";
+    public static final String EXTRA_PARAM_CONSTRAINT = "pt.uac.qa.PARAM_CONSTRAINT";
 
-    private Map<String, Object> fragmentState = new HashMap<>();
     private AppBarConfiguration appBarConfiguration;
     private FloatingActionButton fab;
-
-    public void saveState(final String key, final Object value) {
-        fragmentState.put(key, value);
-    }
-
-    public Object getState(final String key, Object defaultValue) {
-        Object value = fragmentState.get(key);
-        return value == null ? defaultValue : value;
-    }
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -80,28 +68,6 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         final NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                if (menuItem.getItemId() == R.id.nav_logout) {
-                    QAApp app = (QAApp) getApplication();
-                    app.logout();
-                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
-                    finish();
-                    return true;
-                } if (menuItem.getItemId() != R.id.nav_questions) {
-                    Log.d("WTF", "not questions fragment");
-                    fab.hide();
-                } else {
-                    Log.d("WTF", "questions fragment");
-                    fab.show();
-                }
-
-                return false;
-            }
-        });
-
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
@@ -110,12 +76,7 @@ public class MainActivity extends AppCompatActivity {
             public void onDestinationChanged(@NonNull NavController controller, @NonNull NavDestination destination, @Nullable Bundle arguments) {
                 final int id = destination.getId();
 
-                if (id == R.id.nav_logout) {
-                    QAApp app = (QAApp) getApplication();
-                    app.logout();
-                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
-                    finish();
-                } if (id != R.id.nav_questions) {
+                if (id != R.id.nav_questions) {
                     fab.hide();
                 } else {
                     fab.show();
@@ -138,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, AddQuestionActivity.class);
+                Intent intent = new Intent(MainActivity.this, EditQuestionActivity.class);
                 startActivityForResult(intent, 1);
             }
         });
@@ -149,11 +110,37 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
     }
 
+    private void setupSearch(final Menu menu) {
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+
+        searchView.setQueryHint("Pesquisa...");
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                final Intent intent = new Intent(INTENT_FILTER);
+                intent.putExtra(EXTRA_PARAM_CONSTRAINT, newText);
+                sendBroadcast(intent);
+                return false;
+            }
+        });
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_refresh) {
             sendBroadcast(new Intent(INTENT_FILTER));
             return true;
+        } else if (item.getItemId() == R.id.action_logout) {
+            QAApp app = (QAApp) getApplication();
+            app.logout();
+            startActivity(new Intent(MainActivity.this, LoginActivity.class));
+            finish();
         }
 
         return super.onOptionsItemSelected(item);
@@ -163,6 +150,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(final Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
+        setupSearch(menu);
         return true;
     }
 

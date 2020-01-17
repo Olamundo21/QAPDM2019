@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -15,7 +16,6 @@ import android.widget.Toast;
 import java.util.List;
 
 import androidx.annotation.NonNull;
-import pt.uac.qa.MainActivity;
 import pt.uac.qa.R;
 import pt.uac.qa.model.Question;
 import pt.uac.qa.services.QuestionService;
@@ -31,8 +31,6 @@ public class QuestionsFragment extends BaseFragment {
             } else {
                 final List<Question> questions = (List<Question>) intent.getSerializableExtra(QuestionService.RESULT_QUESTIONS);
                 adapter.loadItems(questions);
-                loaded = true;
-                ((MainActivity) getActivity()).saveState("questions_loaded", loaded);
             }
 
             progressBar.setVisibility(View.GONE);
@@ -43,7 +41,6 @@ public class QuestionsFragment extends BaseFragment {
     private QuestionAdapter adapter;
     private ListView questionList;
     private ProgressBar progressBar;
-    private boolean loaded;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_layout, container, false);
@@ -51,6 +48,16 @@ public class QuestionsFragment extends BaseFragment {
         progressBar = root.findViewById(R.id.progressBar);
 
         questionList.setAdapter(adapter = new QuestionAdapter(getActivity()));
+        questionList.setChoiceMode(ListView.CHOICE_MODE_NONE);
+        questionList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                final Question question = (Question) adapter.getItem(position);
+                Intent intent = new Intent(getActivity(), ViewQuestionActivity.class);
+                intent.putExtra("question_id", question.getQuestionId());
+                startActivity(intent);
+            }
+        });
         return root;
     }
 
@@ -59,18 +66,17 @@ public class QuestionsFragment extends BaseFragment {
         loadQuestions();
     }
 
+    @Override
+    protected void search(CharSequence constraint) {
+        adapter.getFilter().filter(constraint);
+    }
+
     @SuppressWarnings("ConstantConditions")
     @Override
     public void onResume() {
         super.onResume();
         getActivity().registerReceiver(receiver, new IntentFilter(QuestionService.INTENT_FILTER));
-
-        MainActivity activity = (MainActivity) getActivity();
-        loaded = (boolean) activity.getState("questions_loaded", false);
-
-        if (!loaded) {
-            loadQuestions();
-        }
+        loadQuestions();
     }
 
     @SuppressWarnings("ConstantConditions")

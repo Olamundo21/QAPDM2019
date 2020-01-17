@@ -14,19 +14,19 @@ import java.util.List;
  * Created by Patrício Cordeiro <patricio.cordeiro@gmail.com> on 10-01-2020.
  */
 public abstract class ListViewAdapter<T> extends BaseAdapter implements Filterable {
-    protected List<T> sourceItems;
-    protected List<T> displayItems;
+    protected final List<T> sourceItems = new ArrayList<>();
+    protected List<T> displayItems = new ArrayList<>(sourceItems);
     protected Context context;
 
     protected ListViewAdapter(final Context context) {
         this.context = context;
-        sourceItems = new ArrayList<>();
-        displayItems = sourceItems;
     }
 
     public void loadItems(List<T> items) {
-        sourceItems = items;
-        displayItems = sourceItems;
+        sourceItems.clear();
+        sourceItems.addAll(items);
+        displayItems = new ArrayList<>(sourceItems);
+        notifyDataSetChanged();
     }
 
     @Override
@@ -65,7 +65,7 @@ public abstract class ListViewAdapter<T> extends BaseAdapter implements Filterab
 
     @Override
     public Filter getFilter() {
-        return null;
+        return new ListViewFilter<>(this);
     }
 
     protected abstract View inflateView();
