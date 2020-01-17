@@ -4,18 +4,20 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-
 import pt.uac.qa.R;
 
-public class MyAnswersFragment extends Fragment {
-
-
+public class MyAnswersFragment extends BaseFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_layout, container, false);
         return root;
+    }
+
+    @Override
+    protected void refresh() {
+        Toast.makeText(getActivity(), "Refresh my answers", Toast.LENGTH_LONG).show();
+
     }
 }

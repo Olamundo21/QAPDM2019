@@ -1,2 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="action_refresh">Refresh</string>
+    <string name="action_search">Pesquisar</string>
+    <string name="action_delete_question">Delete Question</string>
+</resources>

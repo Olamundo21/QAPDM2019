@@ -3,20 +3,20 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
+    android:padding="16dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <TextView
-        style="@style/TextAppearance.AppCompat.Large"
+        style="@style/TextAppearance.AppCompat.Medium"
         android:id="@+id/questionTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Question Tittle"
+        android:text="Question title"
         tools:ignore="HardcodedText" />
 
-
     <TextView
-        style="@style/TextAppearance.AppCompat.Large"
+        style="@style/TextAppearance.AppCompat.Small"
         android:id="@+id/questionAuthor"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -24,6 +24,4 @@
         android:textColor="#aaa"
         android:text="by Question author on date"
         tools:ignore="HardcodedText" />
-
-
 </LinearLayout>

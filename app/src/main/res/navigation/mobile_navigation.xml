@@ -7,22 +7,20 @@
 
     <fragment
         android:id="@+id/nav_questions"
-        android:name="pt.uac.qa.ui.QuestionFragment"
-        android:label="Perguntas"
+        android:name="pt.uac.qa.ui.QuestionsFragment"
+        android:label="@string/menu_questions"
         tools:layout="@layout/fragment_layout" />
 
     <fragment
         android:id="@+id/nav_my_questions"
         android:name="pt.uac.qa.ui.MyQuestionsFragment"
-        android:label="Minhas Perguntas"
+        android:label="@string/menu_my_questions"
         tools:layout="@layout/fragment_layout" />
 
     <fragment
         android:id="@+id/nav_my_answers"
         android:name="pt.uac.qa.ui.MyAnswersFragment"
-        android:label="Minhas Respostas"
+        android:label="@string/menu_my_answers"
         tools:layout="@layout/fragment_layout" />
-
-
 
 </navigation>

@@ -3,9 +3,9 @@ package pt.uac.qa.model;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import androidx.annotation.NonNull;
-
 import java.io.Serializable;
+
+import androidx.annotation.NonNull;
 
 /**
  * Created by Patrício Cordeiro <patricio.cordeiro@gmail.com> on 27-12-2019.

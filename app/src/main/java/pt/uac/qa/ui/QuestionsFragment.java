@@ -14,32 +14,29 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.List;
+
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-
-import java.io.Serializable;
-
+import pt.uac.qa.MainActivity;
 import pt.uac.qa.R;
 import pt.uac.qa.model.Question;
 import pt.uac.qa.services.QuestionService;
 import pt.uac.qa.ui.adapter.ListViewAdapter;
 import pt.uac.qa.ui.adapter.ViewHolder;
 
-// TODO: fazer formulario quando se clica no buttao para criar uma nova pergunta.
-
-public class QuestionFragment extends Fragment {
-
+public class QuestionsFragment extends BaseFragment {
     private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @SuppressWarnings("unchecked")
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.hasExtra(QuestionService.RESULT_ERROR)) {
                 Exception error = (Exception) intent.getSerializableExtra(QuestionService.RESULT_ERROR);
                 Toast.makeText(getContext(), error.getLocalizedMessage(), Toast.LENGTH_LONG).show();
             } else {
-                final Serializable questions = intent.getSerializableExtra(QuestionService.RESULT_QUESTIONS);
-                // TODO: load list view adapter
+                final List<Question> questions = (List<Question>) intent.getSerializableExtra(QuestionService.RESULT_QUESTIONS);
+                adapter.loadItems(questions);
                 loaded = true;
-
+                ((MainActivity) getActivity()).saveState("questions_loaded", loaded);
             }
 
             progressBar.setVisibility(View.GONE);
@@ -58,14 +55,13 @@ public class QuestionFragment extends Fragment {
         progressBar = root.findViewById(R.id.progressBar);
 
         questionList.setAdapter(adapter = new QuestionAdapter(getActivity()));
-
         return root;
     }
 
     @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putBoolean("loaded", loaded);
+    protected void refresh() {
+        Toast.makeText(getActivity(), "Refresh questions", Toast.LENGTH_LONG).show();
+        loadQuestions();
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -73,13 +69,16 @@ public class QuestionFragment extends Fragment {
     public void onResume() {
         super.onResume();
         getActivity().registerReceiver(receiver, new IntentFilter(QuestionService.INTENT_FILTER));
-        loadQuestions();
 
-        if (!loaded){
+        MainActivity activity = (MainActivity) getActivity();
+        loaded = (boolean) activity.getState("questions_loaded", false);
+
+        if (!loaded) {
             loadQuestions();
         }
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     public void onPause() {
         getActivity().unregisterReceiver(receiver);
@@ -95,9 +94,8 @@ public class QuestionFragment extends Fragment {
     /**
      * Adapter
      */
-
     private static class QuestionAdapter extends ListViewAdapter<Question> {
-        protected QuestionAdapter(Context context) {
+        QuestionAdapter(Context context) {
             super(context);
         }
 
@@ -107,10 +105,9 @@ public class QuestionFragment extends Fragment {
         }
 
         @Override
-        protected ViewHolder createViewHolder() {
+        protected ViewHolder<Question> createViewHolder() {
             return new QuestionViewHolder();
         }
-
 
         @Override
         protected boolean acceptsItem(Question item, CharSequence constraint) {
@@ -119,11 +116,9 @@ public class QuestionFragment extends Fragment {
     }
 
     /**
-     * View Holder
+     * View holder
      */
-
-    private static class QuestionViewHolder implements ViewHolder<Question>{
-
+    private static class QuestionViewHolder implements ViewHolder<Question> {
         private TextView title;
         private TextView author;
 
@@ -137,12 +132,9 @@ public class QuestionFragment extends Fragment {
         public void display(Question item) {
             title.setText(item.getTitle());
             author.setText(String.format(
-                    "por %s $s",
+                    "por %s %s",
                     item.getUser().getName(),
-                    DateUtils.getRelativeTimeSpanString(
-                            item.getDatePublished().getTime(),
-                            System.currentTimeMillis(),
-                            DateUtils.SECOND_IN_MILLIS)));
+                    DateUtils.getRelativeTimeSpanString(item.getDatePublished().getTime(), System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS)));
         }
     }
 }

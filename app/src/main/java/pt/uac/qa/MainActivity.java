@@ -1,36 +1,48 @@
 package pt.uac.qa;
 
-import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
-import com.google.android.material.snackbar.Snackbar;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDestination;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-import pt.uac.qa.client.AccessTokenClient;
-import pt.uac.qa.client.ClientException;
-import pt.uac.qa.client.UserClient;
-import pt.uac.qa.model.AccessToken;
 import pt.uac.qa.model.User;
+import pt.uac.qa.ui.AddQuestionActivity;
 
 public class MainActivity extends AppCompatActivity {
+    public static final String INTENT_FILTER = "pt.uac.qa.MAIN_INTENT_FILTER";
+
+    private Map<String, Object> fragmentState = new HashMap<>();
     private AppBarConfiguration appBarConfiguration;
+    private FloatingActionButton fab;
+
+    public void saveState(final String key, final Object value) {
+        fragmentState.put(key, value);
+    }
+
+    public Object getState(final String key, Object defaultValue) {
+        Object value = fragmentState.get(key);
+        return value == null ? defaultValue : value;
+    }
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -42,46 +54,7 @@ public class MainActivity extends AppCompatActivity {
         setupActionButton();
         setupNavigation();
 
-        login();
-
-        //displayUserInformation();
-    }
-
-    @SuppressLint("StaticFieldLeak")
-    private void login() {
-        new AsyncTask<Void, Void, Void>() {
-            private Throwable error;
-
-            @Override
-            protected Void doInBackground(Void... voids) {
-                try {
-                    final AccessTokenClient accessTokenClient = new AccessTokenClient(MainActivity.this);
-                    final AccessToken accessToken = accessTokenClient.getAccessToken("jane.doe@example.com", "HLoZ6r1LzID8^G");
-                    final QAApp app = (QAApp) getApplication();
-
-                    app.setAccessToken(accessToken);
-
-                    final UserClient userClient = new UserClient(MainActivity.this);
-                    final User user = userClient.getUser();
-
-                    app.setUser(user);
-                } catch (ClientException e) {
-                    Log.e(MainActivity.class.getSimpleName(), null, e);
-                    error = e;
-                }
-
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                if (error != null) {
-                    Toast.makeText(MainActivity.this, error.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-                } else {
-                    displayUserInformation();
-                }
-            }
-        }.execute();
+        displayUserInformation();
     }
 
     private void displayUserInformation() {
@@ -102,41 +75,71 @@ public class MainActivity extends AppCompatActivity {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_questions, R.id.nav_my_questions, R.id.nav_my_answers, R.id.nav_logout)
+                R.id.nav_questions, R.id.nav_my_questions, R.id.nav_my_answers)
                 .setDrawerLayout(drawer)
                 .build();
 
         final NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
 
-        navigationView.setNavigationItemSelectedListener(
-        new NavigationView.OnNavigationItemSelectedListener() {
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                if (menuItem.getItemId() == R.id.nav_logout){
-                QAApp app = (QAApp) getApplication();
-                app.logout();
-                startActivity(new Intent(MainActivity.this, LoginActivity.class));
-                finish();
-                return true;
-            }
+                if (menuItem.getItemId() == R.id.nav_logout) {
+                    QAApp app = (QAApp) getApplication();
+                    app.logout();
+                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                    finish();
+                    return true;
+                } if (menuItem.getItemId() != R.id.nav_questions) {
+                    Log.d("WTF", "not questions fragment");
+                    fab.hide();
+                } else {
+                    Log.d("WTF", "questions fragment");
+                    fab.show();
+                }
+
                 return false;
-        }
-    });
+            }
+        });
 
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
+        navController.addOnDestinationChangedListener(new NavController.OnDestinationChangedListener() {
+            @Override
+            public void onDestinationChanged(@NonNull NavController controller, @NonNull NavDestination destination, @Nullable Bundle arguments) {
+                final int id = destination.getId();
+
+                if (id == R.id.nav_logout) {
+                    QAApp app = (QAApp) getApplication();
+                    app.logout();
+                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                    finish();
+                } if (id != R.id.nav_questions) {
+                    fab.hide();
+                } else {
+                    fab.show();
+                }
+            }
+        });
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
+            sendBroadcast(new Intent(INTENT_FILTER));
+        }
+
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 
     private void setupActionButton() {
-        final FloatingActionButton fab = findViewById(R.id.fab);
+        fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent;
-                intent = new Intent(MainActivity.this, AddQuestionActivity.class);
-                startActivity(intent);
+                Intent intent = new Intent(MainActivity.this, AddQuestionActivity.class);
+                startActivityForResult(intent, 1);
             }
         });
     }
@@ -144,6 +147,16 @@ public class MainActivity extends AppCompatActivity {
     private void setupToolbar() {
         final Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_refresh) {
+            sendBroadcast(new Intent(INTENT_FILTER));
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

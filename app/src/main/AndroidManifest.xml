@@ -17,11 +17,6 @@
         android:usesCleartextTraffic="true"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning,UnusedAttribute">
 
-        <activity
-            android:name=".AddQuestionActivity"
-            android:label="@string/adicione_questao"
-            />
-
         <service
             android:name=".services.QuestionService"
             android:exported="false" />
@@ -53,6 +48,8 @@
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity android:name=".ui.AddQuestionActivity" />
 
         <service
             android:name=".services.AccessTokenService"
