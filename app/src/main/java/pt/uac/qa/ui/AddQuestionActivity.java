@@ -14,7 +14,6 @@ import java.util.Arrays;
 
 import androidx.appcompat.app.AppCompatActivity;
 import pt.uac.qa.R;
-import pt.uac.qa.model.Question;
 import pt.uac.qa.services.QuestionService;
 
 public class AddQuestionActivity extends AppCompatActivity {
@@ -24,13 +23,7 @@ public class AddQuestionActivity extends AppCompatActivity {
             if (intent.hasExtra(QuestionService.RESULT_ERROR)) {
                 Exception error = (Exception) intent.getSerializableExtra(QuestionService.RESULT_ERROR);
                 Toast.makeText(AddQuestionActivity.this, error.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-            } else if (intent.hasExtra(QuestionService.RESULT_QUESTION)) {
-                Question question = (Question)intent.getSerializableExtra(QuestionService.RESULT_QUESTION);
-                title.setText(question.getTitle());
-                //body.setText(question.getBody());
-                tags.setText(String.join(",", question.getTags()));
-
-            }else{
+            } else {
                 AddQuestionActivity.this.setResult(Activity.RESULT_OK);
                 finish();
             }
@@ -66,10 +59,5 @@ public class AddQuestionActivity extends AppCompatActivity {
     protected void onDestroy() {
         unregisterReceiver(receiver);
         super.onDestroy();
-    }
-
-    @Override
-    private void loadQuestion() {
-
     }
 }
