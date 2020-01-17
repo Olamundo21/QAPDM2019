@@ -14,6 +14,7 @@ import java.util.Arrays;
 
 import androidx.appcompat.app.AppCompatActivity;
 import pt.uac.qa.R;
+import pt.uac.qa.model.Question;
 import pt.uac.qa.services.QuestionService;
 
 public class EditQuestionActivity extends AppCompatActivity {
@@ -22,11 +23,6 @@ public class EditQuestionActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             if (intent.hasExtra(QuestionService.RESULT_ERROR)) {
                 Exception error = (Exception) intent.getSerializableExtra(QuestionService.RESULT_ERROR);
-<<<<<<< Updated upstream:app/src/main/java/pt/uac/qa/ui/AddQuestionActivity.java
-                Toast.makeText(AddQuestionActivity.this, error.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-            } else {
-                AddQuestionActivity.this.setResult(Activity.RESULT_OK);
-=======
                 Toast.makeText(EditQuestionActivity.this, error.getLocalizedMessage(), Toast.LENGTH_LONG).show();
             } else if (intent.hasExtra(QuestionService.RESULT_QUESTION)) {
                 Question question = (Question) intent.getSerializableExtra(QuestionService.RESULT_QUESTION);
@@ -35,7 +31,6 @@ public class EditQuestionActivity extends AppCompatActivity {
                 tags.setVisibility(View.GONE);
             } else {
                 EditQuestionActivity.this.setResult(Activity.RESULT_OK);
->>>>>>> Stashed changes:app/src/main/java/pt/uac/qa/ui/EditQuestionActivity.java
                 finish();
             }
         }
@@ -80,8 +75,6 @@ public class EditQuestionActivity extends AppCompatActivity {
         unregisterReceiver(receiver);
         super.onDestroy();
     }
-<<<<<<< Updated upstream:app/src/main/java/pt/uac/qa/ui/AddQuestionActivity.java
-=======
 
     private void loadQuestion() {
         Intent intent = getIntent();
@@ -91,5 +84,4 @@ public class EditQuestionActivity extends AppCompatActivity {
             QuestionService.fetchQuestion(this, questionId);
         }
     }
->>>>>>> Stashed changes:app/src/main/java/pt/uac/qa/ui/EditQuestionActivity.java
 }
