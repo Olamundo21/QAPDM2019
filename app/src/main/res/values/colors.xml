@@ -5,4 +5,6 @@
     <color name="colorAccent">#D81B60</color>
 
     <color name="colorSplashScreen">#eee</color>
+
+    <color name="colorSelected">#e0d5da</color>
 </resources>
