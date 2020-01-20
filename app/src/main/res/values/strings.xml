@@ -22,4 +22,7 @@
     <string name="login_failed">"Login failed"</string>
     <string name="action_search">Pesquisar</string>
     <string name="action_delete">Remover</string>
+    <string name="top_bar_edit_question">Editar a sua pergunta</string>
+    <string name="top_bar_list_answers_question">Lista de respostas</string>
+    <string name="top_bar_add_answer">Adicionar Resposta</string>
 </resources>
