@@ -44,7 +44,7 @@ public class EditQuestionActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_question);
+        setContentView(R.layout.activity_edit_question);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         registerReceiver(receiver, new IntentFilter(QuestionService.INTENT_FILTER));
 

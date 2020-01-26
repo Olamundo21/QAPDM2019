@@ -94,7 +94,6 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    // FAB BUTTON QUE ABRE EditQuestionActivity
     private void setupActionButton() {
         fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {

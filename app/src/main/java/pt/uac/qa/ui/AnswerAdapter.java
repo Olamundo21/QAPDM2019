@@ -1,23 +1,28 @@
 package pt.uac.qa.ui;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.text.format.DateUtils;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
+import pt.uac.qa.R;
 import pt.uac.qa.model.Answer;
 import pt.uac.qa.ui.adapter.ListViewAdapter;
 import pt.uac.qa.ui.adapter.ViewHolder;
 
+/**
+ * Created by Patrício Cordeiro <patricio.cordeiro@gmail.com> on 20-01-2020.
+ */
 final class AnswerAdapter extends ListViewAdapter<Answer> {
-
-    protected AnswerAdapter(Context context) {
+    AnswerAdapter(Context context) {
         super(context);
     }
 
     @Override
     protected View inflateView() {
-        return null;
+        return LayoutInflater.from(context).inflate(R.layout.answer_item_layout, null);
     }
 
     @Override
@@ -31,7 +36,6 @@ final class AnswerAdapter extends ListViewAdapter<Answer> {
     }
 
     private static final class AnswerViewHolder implements ViewHolder<Answer> {
-
         private TextView scoreView;
         private TextView bodyView;
         private TextView authorView;
@@ -43,9 +47,18 @@ final class AnswerAdapter extends ListViewAdapter<Answer> {
             authorView = view.findViewById(R.id.authorView);
         }
 
+        @SuppressLint("SetTextI18n")
         @Override
         public void display(Answer item) {
-            scoreView.Text(Integer.toString(item.getNegativeVotes() + item.getPositiveVotes()));
+            scoreView.setText("" + (item.getNegativeVotes() + item.getPositiveVotes()));
+            bodyView.setText(item.getBody());
+            authorView.setText(String.format(
+                    "por %s %s",
+                    item.getUser().getName(),
+                    DateUtils.getRelativeTimeSpanString(
+                            item.getDatePublished().getTime(),
+                            System.currentTimeMillis(),
+                            DateUtils.SECOND_IN_MILLIS)));
         }
     }
 }

@@ -91,7 +91,7 @@ public class Answer implements Serializable {
         answer.setBody(helper.getString("body"));
         answer.setDatePublished(helper.getDate("datePublished"));
         answer.setCorrectAnswer(helper.getBoolean("correctAnswer"));
-        answer.setQuestionId(json.getJSONObject("question").getString("questionId"));
+        answer.setQuestionId(json.getString("questionId"));
         answer.setUser(helper.getUser("user"));
         answer.setNegativeVotes(helper.getInt("negativeVotes"));
 

@@ -1,42 +1,31 @@
 package pt.uac.qa.ui;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.view.View;
-import android.widget.Adapter;
+import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
+import pt.uac.qa.QAApp;
 import pt.uac.qa.R;
 import pt.uac.qa.StringUtils;
 import pt.uac.qa.model.Answer;
 import pt.uac.qa.model.Question;
 import pt.uac.qa.services.QuestionService;
-import pt.uac.qa.ui.adapter.ListViewAdapter;
-import pt.uac.qa.ui.adapter.ViewHolder;
 
 public class ViewQuestionActivity extends AppCompatActivity {
-
-    private TextView title;
-    private TextView body;
-    private TextView tags;
-    private TextView author;
-    private FloatingActionButton fab;
-    private LinearLayout container;
-    private AnswerAdapter adapter;
-    //private String questionId;
-
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -45,27 +34,41 @@ public class ViewQuestionActivity extends AppCompatActivity {
                 Toast.makeText(ViewQuestionActivity.this, error.getLocalizedMessage(), Toast.LENGTH_LONG).show();
             } else if (intent.hasExtra(QuestionService.RESULT_QUESTION)) {
                 Question question = (Question) intent.getSerializableExtra(QuestionService.RESULT_QUESTION);
-                title.setText(question.getTitle());
-                body.setText(question.getBody());
+
+                titleView.setText(question.getTitle());
+                bodyView.setText(question.getBody());
 
                 if (question.getTags() != null && !question.getTags().isEmpty()) {
-                    tags.setVisibility(Integer.parseInt(StringUtils.join(",", question.getTags())));
-                }else {
-                    tags.setVisibility(View.GONE);
+                    tagsView.setText(StringUtils.join(", ", question.getTags()));
+                } else {
+                    tagsView.setVisibility(View.GONE);
                 }
-                author.setText(String.format(
-                        "por %s %s",question.getUser().getName(),
+
+                authorView.setText(String.format(
+                        "por %s %s",
+                        question.getUser().getName(),
                         DateUtils.getRelativeTimeSpanString(
-                        question.getDatePublished().getTime(),
-                        System.currentTimeMillis(),
-                        DateUtils.SECOND_IN_MILLIS)));
+                                question.getDatePublished().getTime(),
+                                System.currentTimeMillis(),
+                                DateUtils.SECOND_IN_MILLIS)));
 
                 if (question.getAnswers() != null && !question.getAnswers().isEmpty()) {
                     adapter.loadItems(question.getAnswers());
                 }
+
+                getSupportActionBar().setTitle(question.getTitle());
             }
         }
     };
+
+    private TextView titleView;
+    private TextView bodyView;
+    private TextView tagsView;
+    private TextView authorView;
+    private LinearLayout container;
+    private AnswerAdapter adapter;
+    private boolean collapsed = false;
+    private String questionId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,52 +77,8 @@ public class ViewQuestionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_view_question);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        // TODO: setup the views
         setupViews();
-        setupActionButton();
         loadQuestion();
-    }
-
-    private void setupViews(){
-        ListView answerListView = findViewById(R.id.answerListView);
-        title = findViewById(R.id.title);
-        body = findViewById(R.id.body);
-        tags = findViewById(R.id.tags);
-        author = findViewById(R.id.author);
-        container = findViewById(R.id.questionContainer);
-
-        title.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (container != collapsed) {
-                    title.setCompoundDrawables(
-                        ContextCompat.getDrawable(
-                    ViewQuestionActivity.this, R.drawable.ic_keyboard_arrow_down_grey_700_18dp),
-                        null, null , null);
-                        container.setVisibility(View.GONE);
-                } else {
-                    title.setCompoundDrawables(
-                            ContextCompat.getDrawable(
-                                    ViewQuestionActivity.this, R.drawable.ic_keyboard_arrow_up_grey_700_18dp),
-                            null, null , null);
-                    container.setVisibility(View.VISIBLE);
-                }
-            }
-        });
-
-        answerListView.setAdapter(adapter = new AnswerAdapter(this));
-    }
-
-    // FAB BUTTON QUE ABRE EditAnswerActivity PARA ADICIONAR RESPOSTAS
-    private void setupActionButton() {
-        fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(ViewQuestionActivity.this, EditAnswerActivity.class);
-                startActivityForResult(intent, 1);
-            }
-        });
     }
 
     @Override
@@ -128,16 +87,76 @@ public class ViewQuestionActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == Activity.RESULT_OK) {
+            loadQuestion();
+        }
+    }
+
+    private void setupViews() {
+        ListView answerListView = findViewById(R.id.answerListView);
+
+        titleView = findViewById(R.id.titleView);
+        bodyView = findViewById(R.id.bodyView);
+        tagsView = findViewById(R.id.tagsView);
+        authorView = findViewById(R.id.authorView);
+        container = findViewById(R.id.questionContainer);
+
+        titleView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Drawable drawable;
+                collapsed = !collapsed;
+
+                if (collapsed) {
+                    drawable = ContextCompat.getDrawable(ViewQuestionActivity.this, R.drawable.ic_keyboard_arrow_down_grey_700_18dp);
+                    container.setVisibility(View.GONE);
+                } else {
+                    drawable = ContextCompat.getDrawable(ViewQuestionActivity.this, R.drawable.ic_keyboard_arrow_up_grey_700_18dp);
+                    container.setVisibility(View.VISIBLE);
+                }
+
+                titleView.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
+            }
+        });
+
+        answerListView.setAdapter(adapter = new AnswerAdapter(this));
+        answerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                QAApp app = (QAApp) getApplication();
+                Answer answer = (Answer) adapter.getItem(position);
+                boolean isMyQuestion = app.getUser().getUserId().equals(answer.getUser().getUserId());
+                Intent intent = new Intent(ViewQuestionActivity.this, ViewAnswerActivity.class);
+                intent.putExtra("answer_id", answer.getAnswerId());
+                intent.putExtra("answer_body", answer.getBody());
+                intent.putExtra("is_my_question", isMyQuestion);
+                startActivityForResult(intent, 2);
+            }
+        });
+
+        findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ViewQuestionActivity.this, EditAnswerActivity.class);
+                intent.putExtra("question_id", questionId);
+                startActivityForResult(intent, 1);
+            }
+        });
+    }
+
     private void loadQuestion() {
         Intent intent = getIntent();
 
         if (intent.hasExtra("question_id")) {
-            String questionId = intent.getStringExtra("question_id");
+            questionId = intent.getStringExtra("question_id");
             QuestionService.fetchQuestion(this, questionId);
         } else {
             Toast.makeText(this, "Need question ID.", Toast.LENGTH_LONG).show();
             finish();
         }
     }
-
 }

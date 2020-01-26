@@ -97,7 +97,7 @@ public class Question implements Serializable {
         question.setBody(helper.getString("body"));
         question.setAnswersGiven(helper.getInt("answersGiven"));
         question.setUser(helper.getUser("user"));
-        question.setTags(helper.getStringList("tags"));
+        question.setTags(helper.getTagList("tags"));
         question.setDatePublished(helper.getDate("datePublished"));
 
         if (json.has("answers")) {

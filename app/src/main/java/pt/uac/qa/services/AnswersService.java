@@ -36,7 +36,7 @@ public class AnswersService extends IntentService {
     private static final String EXTRA_PARAM_ANSWER_ID = "pt.uac.qa.services.PARAM_ANSWER_ID";
     private static final String EXTRA_PARAM_ANSWERS_IDS = "pt.uac.qa.services.extra.PARAM_ANSWERS_IDS";
 
-    public static final String INTENT_FILTER = "pt.uac.qa.services.QUESTION_SERVICE";
+    public static final String INTENT_FILTER = "pt.uac.qa.services.ANSWER_SERVICE";
     public static final String RESULT_ERROR = "pt.uac.qa.services.RESULT_ERROR";
     public static final String RESULT_ANSWERS = "pt.uac.qa.services.RESULT_ANSWERS";
     public static final String RESULT_ANSWER = "pt.uac.qa.services.RESULT_ANSWER";
@@ -69,10 +69,11 @@ public class AnswersService extends IntentService {
     }
 
     // VAI ADICIONAR UMA RESPOSTA
-    public static void addAnswer(Context context, String body) {
+    public static void addAnswer(Context context, String questionId, String body) {
         Intent intent = new Intent(context, AnswersService.class);
         intent.setAction(ACTION_ADD_ANSWER);
         intent.putExtra(EXTRA_PARAM_BODY, body);
+        intent.putExtra(EXTRA_PARAM_QUESTION_ID, questionId);
         context.startService(intent);
     }
 

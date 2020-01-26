@@ -1,5 +1,7 @@
 package pt.uac.qa.model;
 
+import android.text.TextUtils;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -55,17 +57,33 @@ final class JsonHelper {
     }
 
     boolean getBoolean(final String name) throws JSONException {
-        return json.getBoolean(name);
+        if (json.has(name)) {
+            return json.getBoolean(name);
+        }
+
+        return false;
     }
 
-    List<String> getStringList(final String name) throws JSONException {
+    List<String> getTagList(final String name) throws JSONException {
         final List<String> list = new ArrayList<>();
 
         if (!json.isNull(name)) {
             final JSONArray array = json.getJSONArray(name);
 
             for (int i = 0; i < array.length(); i++) {
-                list.add(array.getString(i));
+                final String test = array.getString(i);
+                String tag;
+
+                if (test.startsWith("{")) {
+                    final JSONObject o = array.getJSONObject(i);
+                    tag = o.getString("description");
+                } else {
+                    tag = array.getString(i);
+                }
+
+                if (!TextUtils.isEmpty(tag)) {
+                    list.add(array.getString(i));
+                }
             }
         }
 

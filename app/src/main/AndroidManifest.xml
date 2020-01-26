@@ -16,6 +16,16 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning,UnusedAttribute">
+        <activity android:name=".ui.ViewAnswerActivity"></activity>
+
+        <service
+            android:name=".services.AnswerService"
+            android:exported="false" />
+
+        <activity android:name=".ui.EditAnswerActivity" />
+        <activity
+            android:name=".ui.ViewQuestionActivity"
+            android:parentActivityName=".MainActivity" />
 
         <service
             android:name=".services.QuestionService"
@@ -49,17 +59,8 @@
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".ui.ViewQuestionActivity"
-            android:label="@string/top_bar_list_answers_question"
-            android:parentActivityName=".MainActivity" />
-        <activity
             android:name=".ui.EditQuestionActivity"
-            android:label="@string/top_bar_edit_question"
             android:parentActivityName=".MainActivity" />
-
-        <activity
-            android:name=".ui.EditAnswerActivity"
-            android:label="@string/top_bar_add_answer"/>
 
         <service
             android:name=".services.AccessTokenService"
