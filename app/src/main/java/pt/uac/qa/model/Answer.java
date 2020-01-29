@@ -13,6 +13,7 @@ public class Answer implements Serializable {
     private String answerId;
     private String body;
     private String questionId;
+    private String questionTitle;
     private User user;
     private Date datePublished;
     private boolean correctAnswer;
@@ -41,6 +42,14 @@ public class Answer implements Serializable {
 
     public void setQuestionId(String questionId) {
         this.questionId = questionId;
+    }
+
+    public String getQuestionTitle() {
+        return questionTitle;
+    }
+
+    public void setQuestionTitle(String questionTitle) {
+        this.questionTitle = questionTitle;
     }
 
     public User getUser() {
@@ -91,9 +100,23 @@ public class Answer implements Serializable {
         answer.setBody(helper.getString("body"));
         answer.setDatePublished(helper.getDate("datePublished"));
         answer.setCorrectAnswer(helper.getBoolean("correctAnswer"));
-        answer.setQuestionId(json.getString("questionId"));
         answer.setUser(helper.getUser("user"));
         answer.setNegativeVotes(helper.getInt("negativeVotes"));
+
+        /*
+        O objecto Answer quando pedimos as MyAnswers não vem com o questionId,
+        vem com um objecto question, que tem o questionId e o title.
+        Por isso adicionei o campo questionTitle à classe Answer de forma a que
+        funcione nos dois casos.
+         */
+        if (json.has("questionId")) {
+            answer.setQuestionId(helper.getString("questionId"));
+        } else if (json.has("question")) {
+            final JSONObject question = json.getJSONObject("question");
+
+            answer.setQuestionId(question.getString("questionId"));
+            answer.setQuestionTitle(question.getString("title"));
+        }
 
         return answer;
     }

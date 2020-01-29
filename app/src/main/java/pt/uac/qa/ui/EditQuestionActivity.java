@@ -49,8 +49,15 @@ public class EditQuestionActivity extends AppCompatActivity {
         registerReceiver(receiver, new IntentFilter(QuestionService.INTENT_FILTER));
 
         title = findViewById(R.id.title);
-        body = findViewById(R.id.body);
+        body = findViewById(R.id.body_question);
         tags = findViewById(R.id.tags);
+        loadQuestion();
+
+        if (questionId != null){
+            this.setTitle("Actualize A Questão");
+        } else {
+            this.setTitle("Adicione Nova Questão");
+        }
 
         findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -66,8 +73,6 @@ public class EditQuestionActivity extends AppCompatActivity {
                 }
             }
         });
-
-        loadQuestion();
     }
 
     @Override

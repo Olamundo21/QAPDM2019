@@ -132,6 +132,7 @@ public class ViewQuestionActivity extends AppCompatActivity {
                 boolean isMyQuestion = app.getUser().getUserId().equals(answer.getUser().getUserId());
                 Intent intent = new Intent(ViewQuestionActivity.this, ViewAnswerActivity.class);
                 intent.putExtra("answer_id", answer.getAnswerId());
+                intent.putExtra("question_id", answer.getQuestionId());
                 intent.putExtra("answer_body", answer.getBody());
                 intent.putExtra("is_my_question", isMyQuestion);
                 startActivityForResult(intent, 2);

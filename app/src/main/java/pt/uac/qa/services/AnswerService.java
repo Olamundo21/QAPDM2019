@@ -15,12 +15,16 @@ import pt.uac.qa.model.Answer;
 import static android.content.ContentValues.TAG;
 
 public class AnswerService extends IntentService {
+    private static final String TAG = "AnswersService";
 
     private static final String ACTION_ADD_ANSWER = "pt.uac.qa.services.action.ADD_ANSWER";
     private static final String ACTION_FETCH_ANSWER = "pt.uac.qa.services.action.FETCH_ANSWER";
     private static final String ACTION_FETCH_MY_ANSWERS = "pt.uac.qa.services.action.FETCH_MY_ANSWERS";
     private static final String ACTION_DELETE_ANSWERS = "pt.uac.qa.services.action.DELETE_ANSWERS";
     private static final String ACTION_UPDATE_ANSWER = "pt.uac.qa.services.action.UPDATE_ANSWER";
+    private static final String ACTION_UP_VOTE_ANSWER = "pt.uac.qa.services.action.UP_VOTE_ANSWER";
+    private static final String ACTION_DOWN_VOTE_ANSWER = "pt.uac.qa.services.action.DOWN_VOTE_ANSWER";
+    private static final String ACTION_IS_CORRECT_ANSWER = "pt.uac.qa.services.action.IS_CORRECT_ANSWER";
 
 
     // TODO: Rename parameters
@@ -60,19 +64,35 @@ public class AnswerService extends IntentService {
         context.startService(intent);
     }
 
-    public static void deleteAnswers(Context context, String answerId) {
+    public static void deleteAnswers(Context context, String... answerIds) {
         Intent intent = new Intent(context, AnswerService.class);
         intent.setAction(ACTION_DELETE_ANSWERS);
+        intent.putExtra(EXTRA_PARAM_ANSWERS_IDS, answerIds);
         context.startService(intent);
     }
 
-    public static void updateAnswer(Context context, String answerId, String body) {
+    public static void updateAnswer(Context context, String answerId, String answerBody) {
         Intent intent = new Intent(context, AnswerService.class);
         intent.setAction(ACTION_UPDATE_ANSWER);
         intent.putExtra(EXTRA_PARAM_ANSWER_ID, answerId);
-        intent.putExtra(EXTRA_PARAM_ANSWER_BODY, body);
+        intent.putExtra(EXTRA_PARAM_ANSWER_BODY, answerBody);
         context.startService(intent);
     }
+
+    public static void upVoteAnswer(Context context, String answerId) {
+        Intent intent = new Intent(context, AnswerService.class);
+        intent.setAction(ACTION_UP_VOTE_ANSWER);
+        intent.putExtra(EXTRA_PARAM_ANSWER_ID, answerId);
+        context.startService(intent);
+    }
+
+    public static void downVoteAnswer(Context context, String answerId) {
+        Intent intent = new Intent(context, AnswerService.class);
+        intent.setAction(ACTION_DOWN_VOTE_ANSWER);
+        intent.putExtra(EXTRA_PARAM_ANSWER_ID, answerId);
+        context.startService(intent);
+    }
+
 
     @Override
     protected void onHandleIntent(Intent intent) {
@@ -99,7 +119,35 @@ public class AnswerService extends IntentService {
             } else if (ACTION_DELETE_ANSWERS.equals((action))){
                 String[] answersIds = intent.getStringArrayExtra(EXTRA_PARAM_ANSWERS_IDS);
                 deleteAnswers(answersIds);
+
+            }  else if (ACTION_DOWN_VOTE_ANSWER.equals((action))){
+                final String answerId = intent.getStringExtra(EXTRA_PARAM_ANSWER_ID);
+                downVoteAnswer(answerId);
             }
+        }
+    }
+
+    private void upVoteAnswer(String answerId) {
+        try {
+            AnswerClient client= new AnswerClient(this);
+            client.voteAnswerUp(answerId);
+            Intent intent = new Intent(INTENT_FILTER);
+            sendBroadcast(intent);
+        } catch (ClientException e) {
+            Log.e(TAG, null, e);
+            sendErrorBroadcast(e);
+        }
+    }
+
+    private void downVoteAnswer(String answerId) {
+        try {
+            AnswerClient client= new AnswerClient(this);
+            client.voteAnswerDown(answerId);
+            Intent intent = new Intent(INTENT_FILTER);
+            sendBroadcast(intent);
+        } catch (ClientException e) {
+            Log.e(TAG, null, e);
+            sendErrorBroadcast(e);
         }
     }
 

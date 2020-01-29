@@ -23,4 +23,6 @@
     <string name="action_search">Pesquisar</string>
     <string name="action_delete">Remover</string>
     <string name="action_accept">Aceitar</string>
+    <string name="negativo">Negativo</string>
+    <string name="positivo">Positivo</string>
 </resources>
