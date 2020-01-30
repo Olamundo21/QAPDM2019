@@ -55,8 +55,8 @@ public class ViewAnswerActivity extends AppCompatActivity {
         registerReceiver(receiver, new IntentFilter(AnswerService.INTENT_FILTER));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        loadAnswer();
         setupViews();
+        loadAnswer();
     }
 
     private void setupViews() {
@@ -77,8 +77,13 @@ public class ViewAnswerActivity extends AppCompatActivity {
         if (item.getItemId() == R.id.action_upvote) {
             upVoteAnswer();
             return true;
+
         } else if (item.getItemId() == R.id.action_downvote) {
             downVoteAnswer();
+            return true;
+
+        } else if (item.getItemId() == R.id.action_markcorrect) {
+            markCorrectAnswer();
             return true;
         }
 
@@ -88,16 +93,19 @@ public class ViewAnswerActivity extends AppCompatActivity {
     private void downVoteAnswer() {
         Intent intent = getIntent();
         String answerId = intent.getStringExtra("answer_id");
-
         AnswerService.downVoteAnswer(this, answerId);
     }
 
     private void upVoteAnswer() {
         Intent intent = getIntent();
         String answerId = intent.getStringExtra("answer_id");
-        String idOla = intent.getStringExtra("question_id");
-        Toast.makeText(this, "o question id e-> "+ idOla + "e o " + answerId, Toast.LENGTH_LONG).show();
         AnswerService.upVoteAnswer(this, answerId);
+    }
+
+    private void markCorrectAnswer() {
+        Intent intent = getIntent();
+        String answerId = intent.getStringExtra("answer_id");
+        AnswerService.markCorrectAnswer(this, answerId);
     }
 
     private void loadAnswer() {

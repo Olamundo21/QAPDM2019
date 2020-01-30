@@ -25,4 +25,7 @@
     <string name="action_accept">Aceitar</string>
     <string name="negativo">Negativo</string>
     <string name="positivo">Positivo</string>
+    <string name="mark_correct">Mark Correct</string>
+    <string name="down_vote">Down Vote</string>
+    <string name="upvote">UpVote</string>
 </resources>

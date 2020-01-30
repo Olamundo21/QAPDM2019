@@ -24,7 +24,7 @@ public class AnswerService extends IntentService {
     private static final String ACTION_UPDATE_ANSWER = "pt.uac.qa.services.action.UPDATE_ANSWER";
     private static final String ACTION_UP_VOTE_ANSWER = "pt.uac.qa.services.action.UP_VOTE_ANSWER";
     private static final String ACTION_DOWN_VOTE_ANSWER = "pt.uac.qa.services.action.DOWN_VOTE_ANSWER";
-    private static final String ACTION_IS_CORRECT_ANSWER = "pt.uac.qa.services.action.IS_CORRECT_ANSWER";
+    private static final String ACTION_MARK_CORRECT_ANSWER = "pt.uac.qa.services.action.MARK_CORRECT_ANSWER";
 
 
     // TODO: Rename parameters
@@ -79,6 +79,13 @@ public class AnswerService extends IntentService {
         context.startService(intent);
     }
 
+    public static void markCorrectAnswer(Context context, String answerId){
+        Intent intent = new Intent(context, AnswerService.class);
+        intent.setAction(ACTION_MARK_CORRECT_ANSWER);
+        intent.putExtra(EXTRA_PARAM_ANSWER_ID, answerId);
+        context.startService(intent);
+    }
+
     public static void upVoteAnswer(Context context, String answerId) {
         Intent intent = new Intent(context, AnswerService.class);
         intent.setAction(ACTION_UP_VOTE_ANSWER);
@@ -107,11 +114,11 @@ public class AnswerService extends IntentService {
             } else if (ACTION_FETCH_MY_ANSWERS.equals(action)) {
                 getMyAnswers();
 
-            } else if ((ACTION_FETCH_ANSWER.equals(action))) {
+            } else if (ACTION_FETCH_ANSWER.equals(action)) {
                 final String answerId = intent.getStringExtra(EXTRA_PARAM_ANSWER_ID);
                 getAnswer(answerId);
 
-            } else if ((ACTION_UPDATE_ANSWER.equals(action))) {
+            } else if (ACTION_UPDATE_ANSWER.equals(action)) {
                 final String answerId = intent.getStringExtra(EXTRA_PARAM_ANSWER_ID);
                 final String answerBody = intent.getStringExtra(EXTRA_PARAM_ANSWER_BODY);
                 updateAnswer(answerId, answerBody);
@@ -123,7 +130,25 @@ public class AnswerService extends IntentService {
             }  else if (ACTION_DOWN_VOTE_ANSWER.equals((action))){
                 final String answerId = intent.getStringExtra(EXTRA_PARAM_ANSWER_ID);
                 downVoteAnswer(answerId);
+
+            }  else if (ACTION_UP_VOTE_ANSWER.equals((action))){
+                final String answerId = intent.getStringExtra(EXTRA_PARAM_ANSWER_ID);
+                upVoteAnswer(answerId);
+
+            }  else if (ACTION_MARK_CORRECT_ANSWER.equals((action))){
+                final String answerId = intent.getStringExtra(EXTRA_PARAM_ANSWER_ID);
+                markCorrectAnswer(answerId);
             }
+        }
+    }
+
+    private void markCorrectAnswer(String answerId) {
+        try {
+            AnswerClient client = new AnswerClient(this);
+            client.markAnswerCorrect(answerId);
+            sendBroadcast(new Intent(INTENT_FILTER));
+        } catch (ClientException e) {
+            sendErrorBroadcast(e);
         }
     }
 
