@@ -50,7 +50,7 @@ final class AnswerAdapter extends ListViewAdapter<Answer> {
         @SuppressLint("SetTextI18n")
         @Override
         public void display(Answer item) {
-            scoreView.setText("" + (item.getNegativeVotes() + item.getPositiveVotes()));
+            scoreView.setText("" + (item.getPositiveVotes() - item.getNegativeVotes()));
             bodyView.setText(item.getBody());
             authorView.setText(String.format(
                     "por %s %s",

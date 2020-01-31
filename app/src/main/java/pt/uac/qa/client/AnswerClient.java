@@ -117,7 +117,7 @@ public class AnswerClient extends AuthenticatedClient {
         return executeRequest(new AuthenticatedRequest<Answer>() {
             @Override
             Response<Answer> doExecute() throws IOException {
-                final HttpResponse response = httpClient.patch(
+                final HttpResponse response = httpClient.put(
                         url(String.format("/answers/%s/vote-up", answerId)));
 
                 return new AnswerResponse(response);
@@ -129,7 +129,7 @@ public class AnswerClient extends AuthenticatedClient {
         return executeRequest(new AuthenticatedRequest<Answer>() {
             @Override
             Response<Answer> doExecute() throws IOException {
-                final HttpResponse response = httpClient.patch(
+                final HttpResponse response = httpClient.put(
                         url(String.format("/answers/%s/vote-down", answerId)));
 
                 return new AnswerResponse(response);

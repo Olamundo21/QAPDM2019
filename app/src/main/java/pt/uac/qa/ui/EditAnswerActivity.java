@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import pt.uac.qa.R;
+import pt.uac.qa.client.AnswerClient;
 import pt.uac.qa.model.Answer;
 import pt.uac.qa.services.AnswerService;
 
@@ -79,14 +80,15 @@ public class EditAnswerActivity extends AppCompatActivity {
         if (answerId != null) {
             final String body = answerBody.getText().toString();
             AnswerService.updateAnswer(EditAnswerActivity.this, answerId, body);
+
         } else {
             final String body = answerBody.getText().toString();
             Intent intent = getIntent();
             String questionId = intent.getStringExtra("question_id");
-            AnswerService.addAnswer(this, questionId, body);
+            AnswerService.addAnswer(EditAnswerActivity.this, questionId, body);
         }
-
     }
+
 
     @Override
     protected void onDestroy() {

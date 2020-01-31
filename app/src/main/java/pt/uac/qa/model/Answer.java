@@ -102,6 +102,7 @@ public class Answer implements Serializable {
         answer.setCorrectAnswer(helper.getBoolean("correctAnswer"));
         answer.setUser(helper.getUser("user"));
         answer.setNegativeVotes(helper.getInt("negativeVotes"));
+        answer.setPositiveVotes(helper.getInt("positiveVotes"));
 
         /*
         O objecto Answer quando pedimos as MyAnswers não vem com o questionId,

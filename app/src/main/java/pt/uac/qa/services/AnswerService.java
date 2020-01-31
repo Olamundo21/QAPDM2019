@@ -148,6 +148,7 @@ public class AnswerService extends IntentService {
             client.markAnswerCorrect(answerId);
             sendBroadcast(new Intent(INTENT_FILTER));
         } catch (ClientException e) {
+            Log.e(TAG, null, e);
             sendErrorBroadcast(e);
         }
     }
@@ -163,6 +164,7 @@ public class AnswerService extends IntentService {
             sendErrorBroadcast(e);
         }
     }
+
 
     private void downVoteAnswer(String answerId) {
         try {

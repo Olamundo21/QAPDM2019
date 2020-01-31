@@ -8,6 +8,8 @@ import android.content.IntentFilter;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.format.DateUtils;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
@@ -159,5 +161,20 @@ public class ViewQuestionActivity extends AppCompatActivity {
             Toast.makeText(this, "Need question ID.", Toast.LENGTH_LONG).show();
             finish();
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_question_view, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_refresh) {
+            loadQuestion();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

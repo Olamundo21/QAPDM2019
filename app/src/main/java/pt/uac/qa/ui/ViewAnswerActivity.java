@@ -1,5 +1,6 @@
 package pt.uac.qa.ui;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -19,6 +20,7 @@ import pt.uac.qa.services.AnswerService;
 
 public class ViewAnswerActivity extends AppCompatActivity {
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
+        @SuppressLint("SetTextI18n")
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.hasExtra(AnswerService.RESULT_ERROR)) {
@@ -28,7 +30,12 @@ public class ViewAnswerActivity extends AppCompatActivity {
                 Answer answer = (Answer) intent.getSerializableExtra(AnswerService.RESULT_ANSWER);
 
                 bodyView.setText(answer.getBody());
-                scoreView.setText("" + (answer.getNegativeVotes() + answer.getPositiveVotes()));
+
+                int negative = answer.getNegativeVotes();
+                int positive = answer.getPositiveVotes();
+                int total = positive - negative;
+
+                scoreView.setText("" + total);
 
                 authorView.setText(String.format(
                         "por %s %s",
@@ -94,12 +101,14 @@ public class ViewAnswerActivity extends AppCompatActivity {
         Intent intent = getIntent();
         String answerId = intent.getStringExtra("answer_id");
         AnswerService.downVoteAnswer(this, answerId);
+        loadAnswer();
     }
 
     private void upVoteAnswer() {
         Intent intent = getIntent();
         String answerId = intent.getStringExtra("answer_id");
         AnswerService.upVoteAnswer(this, answerId);
+        loadAnswer();
     }
 
     private void markCorrectAnswer() {
