@@ -54,9 +54,9 @@ public class EditQuestionActivity extends AppCompatActivity {
         loadQuestion();
 
         if (questionId != null){
-            this.setTitle("Actualize A Questão");
+            this.setTitle("Actualize a pergunta");
         } else {
-            this.setTitle("Adicione Nova Questão");
+            this.setTitle("Adicione uma nova pergunta");
         }
 
         findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {

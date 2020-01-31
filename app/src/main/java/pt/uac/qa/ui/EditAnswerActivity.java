@@ -49,9 +49,9 @@ public class EditAnswerActivity extends AppCompatActivity {
         loadAnswer();
 
         if (answerId != null){
-            this.setTitle("Actualize a questão");
+            this.setTitle("Actualize a resposta");
         } else {
-            this.setTitle("Adicione a questão");
+            this.setTitle("Adicione a resposta");
         }
     }
 
